@@ -1,0 +1,45 @@
+# Purpose: Local full stack — MySQL + API (frontend runs via Vite dev or separate static host).
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: filemagic-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: filemagic
+      MYSQL_USER: filemagic
+      MYSQL_PASSWORD: filemagic
+    ports:
+      - "3306:3306"
+    volumes:
+      - filemagic-mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 6s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.backend
+    container_name: filemagic-api
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: filemagic
+      MYSQL_USER: filemagic
+      MYSQL_PASSWORD: filemagic
+      JWT_SECRET: change-me-in-production-min-32-chars-long-secret-key
+      GUEST_SIGNING_KEY: change-guest-signing-key
+      CORS_ORIGIN_1: http://localhost:5173
+      CORS_ORIGIN_2: http://127.0.0.1:5173
+    ports:
+      - "8080:8080"
+
+volumes:
+  filemagic-mysql-data: {}
