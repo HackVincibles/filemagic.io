@@ -1,0 +1,24 @@
+/* Purpose: Global Tailwind layers + subtle motion (GPU-friendly). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './variables.css';
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-mist-50 text-slate-800 min-h-screen;
+  }
+}
+
+@layer utilities {
+  .fm-glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/60 shadow-soft;
+  }
+  .fm-card-3d {
+    @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lift;
+  }
+}

@@ -1,0 +1,7 @@
+/* Purpose: Design tokens — soft minimal theme (PDFGear-inspired, distinct palette). */
+:root {
+  --fm-radius-lg: 1.25rem;
+  --fm-radius-xl: 1.75rem;
+  --fm-glass: rgba(255, 255, 255, 0.72);
+  --fm-border: rgba(15, 23, 42, 0.06);
+}

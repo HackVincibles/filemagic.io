@@ -1,0 +1,58 @@
+# Purpose: Spring Boot defaults — override via env or application-local.yml (not committed).
+spring:
+  application:
+    name: filemagic-api
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:filemagic}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
+    username: ${MYSQL_USER:filemagic}
+    password: ${MYSQL_PASSWORD:filemagic}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  servlet:
+    multipart:
+      max-file-size: ${MAX_UPLOAD_BYTES:53687091200}
+      max-request-size: ${MAX_REQUEST_BYTES:53687091200}
+      file-size-threshold: 2MB
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+
+filemagic:
+  security:
+    jwt-secret: ${JWT_SECRET:dev-change-me-use-long-random-string-min-256-bits}
+    jwt-issuer: filemagic.io
+    access-token-minutes: ${JWT_ACCESS_MINUTES:30}
+    refresh-token-days: ${JWT_REFRESH_DAYS:14}
+    guest-cookie-name: fm_guest
+    guest-cookie-signing-key: ${GUEST_SIGNING_KEY:dev-guest-signing-key-change-me}
+  cors:
+    allowed-origins:
+      - ${CORS_ORIGIN_1:http://localhost:5173}
+      - ${CORS_ORIGIN_2:http://127.0.0.1:5173}
+  storage:
+    local-path: ${FILEMAGIC_STORAGE:./data/filemagic-storage}
+    temp-path: ${FILEMAGIC_TEMP:./tmp/filemagic-uploads}
+  rate-limit:
+    api-per-minute-ip: ${RATE_LIMIT_IP_PER_MIN:120}
+    api-per-minute-user: ${RATE_LIMIT_USER_PER_MIN:300}
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/payment-success}
+    cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/pricing}
+
+logging:
+  level:
+    io.filemagic: INFO
+    org.springframework.security: INFO

@@ -28,16 +28,17 @@ CREATE TABLE subscription_plans (
     ops_per_day     INT UNSIGNED NOT NULL,
     history_days    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0 = no server-side history',
     ads_enabled     TINYINT(1) NOT NULL DEFAULT 1,
+    price_usd       DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_subscription_plans_code (code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO subscription_plans (code, display_name, max_file_bytes, max_batch_files, ops_per_day, history_days, ads_enabled) VALUES
-('GUEST',       'Guest',            52428800,    1,    10,   0, 1),
-('FREE',        'Free',             104857600,   1,    25,   0, 1),
-('INDIVIDUAL',  'Individual',       5368709120,  25,   3000, 7, 0),
-('BUSINESS',    'Business',         53687091200, 500, 50000, 15, 0);
+INSERT INTO subscription_plans (code, display_name, max_file_bytes, max_batch_files, ops_per_day, history_days, ads_enabled, price_usd) VALUES
+('GUEST',       'Guest',            52428800,    1,    10,   0, 1, 0.00),
+('FREE',        'Free',             104857600,   1,    25,   0, 1, 0.00),
+('INDIVIDUAL',  'Individual',       5368709120,  25,   3000, 7, 0, 9.99),
+('BUSINESS',    'Business',         53687091200, 500, 50000, 15, 0, 49.99);
 
 -- ---------------------------------------------------------------------------
 -- users: registered accounts (guests are not stored here)
@@ -49,7 +50,7 @@ CREATE TABLE users (
     display_name         VARCHAR(120) NULL,
     subscription_plan_id TINYINT UNSIGNED NOT NULL DEFAULT 2,
     plan_expires_at      DATETIME NULL COMMENT 'NULL = no expiry for FREE',
-    razorpay_customer_id VARCHAR(128) NULL,
+    stripe_customer_id   VARCHAR(128) NULL,
     is_active            TINYINT(1) NOT NULL DEFAULT 1,
     created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -106,17 +107,17 @@ CREATE TABLE usage_daily (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
--- payments: Razorpay and future gateways
+-- payments: Stripe and future gateways
 -- ---------------------------------------------------------------------------
 CREATE TABLE payments (
     id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id            BIGINT UNSIGNED NOT NULL,
     subscription_plan_id TINYINT UNSIGNED NOT NULL,
-    gateway            VARCHAR(32) NOT NULL DEFAULT 'RAZORPAY',
-    gateway_order_id   VARCHAR(128) NOT NULL,
+    gateway            VARCHAR(32) NOT NULL DEFAULT 'STRIPE',
+    gateway_order_id   VARCHAR(128) NOT NULL COMMENT 'Stripe Session ID or Intent ID',
     gateway_payment_id VARCHAR(128) NULL,
     amount_paise       BIGINT UNSIGNED NOT NULL,
-    currency           VARCHAR(8) NOT NULL DEFAULT 'INR',
+    currency           VARCHAR(8) NOT NULL DEFAULT 'USD',
     status             VARCHAR(32) NOT NULL COMMENT 'CREATED, PAID, FAILED',
     raw_payload_json   JSON NULL,
     created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
