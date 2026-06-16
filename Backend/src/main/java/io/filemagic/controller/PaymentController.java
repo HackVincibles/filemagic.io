@@ -1,11 +1,12 @@
+
 package io.filemagic.controller;
 
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import io.filemagic.config.FilemagicProperties;
-import io.filemagic.model.SubscriptionPlan;
-import io.filemagic.model.UserRecord;
+import io.filemagic.document.SubscriptionPlan;
+import io.filemagic.document.User;
 import io.filemagic.repository.SubscriptionPlanRepository;
 import io.filemagic.repository.UserRepository;
 import io.filemagic.service.StripeService;
@@ -38,13 +39,13 @@ public class PaymentController {
 
     @PostMapping("/create-checkout-session")
     public ResponseEntity<Map<String, String>> createCheckoutSession(
-            @AuthenticationPrincipal Long userId,
-            @RequestBody Map<String, Integer> body) {
-        
-        int planId = body.getOrDefault("planId", 0);
-        UserRecord user = userRepository.findById(userId)
+            @AuthenticationPrincipal String userId,
+            @RequestBody Map<String, String> body) {
+
+        String planCode = body.getOrDefault("planId", null);
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        SubscriptionPlan plan = planRepository.findById(planId)
+        SubscriptionPlan plan = planRepository.findByCode(planCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found"));
 
         try {
@@ -76,12 +77,12 @@ public class PaymentController {
     }
 
     private void handleSuccessfulPayment(Session session) {
-        long userId = Long.parseLong(session.getMetadata().get("userId"));
-        int planId = Integer.parseInt(session.getMetadata().get("planId"));
-        
+        String userId = session.getMetadata().get("userId");
+        String planCode = session.getMetadata().get("planId");
+
         // Update user plan to the new plan for 30 days
         Instant expiresAt = Instant.now().plus(30, ChronoUnit.DAYS);
-        userRepository.updatePlan(userId, planId, expiresAt);
+        userRepository.updatePlan(userId, planCode, expiresAt);
         userRepository.updateStripeCustomerId(userId, session.getCustomer());
     }
 }

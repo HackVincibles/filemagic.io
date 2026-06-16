@@ -9,7 +9,7 @@
         <groupId>io.filemagic</groupId>
         <artifactId>filemagic-platform</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>file-processing-engine</artifactId>

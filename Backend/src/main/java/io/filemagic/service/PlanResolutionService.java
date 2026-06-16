@@ -1,10 +1,11 @@
+
 /*
  * Purpose: Map JWT user or guest to SubscriptionPlan.
  */
 package io.filemagic.service;
 
-import io.filemagic.model.SubscriptionPlan;
-import io.filemagic.model.UserRecord;
+import io.filemagic.document.SubscriptionPlan;
+import io.filemagic.document.User;
 import io.filemagic.repository.SubscriptionPlanRepository;
 import io.filemagic.repository.UserRepository;
 import io.filemagic.security.JwtAuthenticationFilter.AuthenticatedUser;
@@ -23,16 +24,16 @@ public class PlanResolutionService {
     }
 
     public SubscriptionPlan resolve(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser au) {
-            UserRecord user = userRepository.findById(au.id()).orElseThrow();
-            return planRepository.findById(user.subscriptionPlanId()).orElseThrow();
+        if (authentication != null && authentication.getPrincipal() instanceof String userId) {
+            User user = userRepository.findById(userId).orElseThrow();
+            return planRepository.findByCode(user.getSubscriptionPlanCode()).orElseThrow();
         }
         return planRepository.findByCode("GUEST").orElseThrow();
     }
 
     public String subjectKey(Authentication authentication, String guestFingerprint) {
-        if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser au) {
-            return "u:" + au.id();
+        if (authentication != null && authentication.getPrincipal() instanceof String userId) {
+            return "u:" + userId;
         }
         return guestFingerprint;
     }

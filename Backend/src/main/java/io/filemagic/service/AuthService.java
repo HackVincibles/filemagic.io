@@ -1,9 +1,11 @@
+
 /*
  * Purpose: Registration and login with bcrypt + JWT.
  */
 package io.filemagic.service;
 
-import io.filemagic.model.UserRecord;
+import io.filemagic.document.SubscriptionPlan;
+import io.filemagic.document.User;
 import io.filemagic.repository.SubscriptionPlanRepository;
 import io.filemagic.repository.UserRepository;
 import io.filemagic.security.JwtService;
@@ -38,27 +40,27 @@ public class AuthService {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
-        int freePlanId = planRepository.findByCode("FREE").orElseThrow().id();
+        SubscriptionPlan freePlan = planRepository.findByCode("FREE").orElseThrow();
         String hash = passwordEncoder.encode(password);
-        long id = userRepository.insert(email, hash, displayName != null ? displayName : email, freePlanId);
-        String access = jwtService.createAccessToken(id, email);
+        User user = userRepository.insert(email, hash, displayName != null ? displayName : email, freePlan.getCode());
+        String access = jwtService.createAccessToken(user.getId(), email);
         return new TokenPair(access);
     }
 
     public TokenPair login(String email, String password) {
-        UserRecord user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
-        if (!user.active()) {
+        if (!user.getActive()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account disabled");
         }
-        if (!passwordEncoder.matches(password, user.passwordHash())) {
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
-        String access = jwtService.createAccessToken(user.id(), user.email());
+        String access = jwtService.createAccessToken(user.getId(), user.getEmail());
         return new TokenPair(access);
     }
 
-    public UserRecord getProfile(long userId) {
+    public User getProfile(String userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }

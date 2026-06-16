@@ -1,11 +1,12 @@
+
 package io.filemagic.service;
 
 import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import io.filemagic.config.FilemagicProperties;
-import io.filemagic.model.SubscriptionPlan;
-import io.filemagic.model.UserRecord;
+import io.filemagic.document.SubscriptionPlan;
+import io.filemagic.document.User;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,13 +22,13 @@ public class StripeService {
         Stripe.apiKey = properties.stripe().secretKey();
     }
 
-    public Session createCheckoutSession(UserRecord user, SubscriptionPlan plan) throws Exception {
+    public Session createCheckoutSession(User user, SubscriptionPlan plan) throws Exception {
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(properties.stripe().successUrl() + "?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl(properties.stripe().cancelUrl())
-                .setCustomerEmail(user.email())
+                .setCustomerEmail(user.getEmail())
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setQuantity(1L)
@@ -37,15 +38,15 @@ public class StripeService {
                                                 .setUnitAmount(calculateAmount(plan))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(plan.displayName() + " Plan")
+                                                                .setName(plan.getDisplayName() + " Plan")
                                                                 .build()
                                                 )
                                                 .build()
                                 )
                                 .build()
                 )
-                .putMetadata("userId", String.valueOf(user.id()))
-                .putMetadata("planId", String.valueOf(plan.id()))
+                .putMetadata("userId", user.getId())
+                .putMetadata("planId", plan.getCode())
                 .build();
 
         return Session.create(params);
@@ -53,7 +54,7 @@ public class StripeService {
 
     private long calculateAmount(SubscriptionPlan plan) {
         // Example logic: Individual = $9.99, Business = $49.99
-        return switch (plan.code()) {
+        return switch (plan.getCode()) {
             case "INDIVIDUAL" -> 999L;
             case "BUSINESS" -> 4999L;
             default -> 0L;

@@ -1,242 +1,368 @@
 /**
- * Purpose: Marketing landing — PDFGear-style sections: hero, tools, trust, features, FAQ, CTA (semantic HTML).
+ * Purpose: Beautiful marketing landing page for FileMagic
  */
 import { Link } from 'react-router-dom';
+import FileHero3D from '../components/FileHero3D';
+import {
+  FiFile, FiFolder, FiCompass, FiTrendingUp, FiShield,
+  FiZap, FiDownload, FiFileText, FiImage, FiMusic,
+  FiArchive, FiLock, FiArrowRight, FiStar, FiCheckCircle
+} from 'react-icons/fi';
 
-const onlineTools = [
-  { title: 'Compress file', desc: 'Smaller archives with Huffman, LZ77, or RLE.', href: '/upload?op=COMPRESS', tag: 'Popular' },
-  { title: 'Decompress', desc: 'Restore FMH1, FML1, or FMR1 outputs.', href: '/upload?op=DECOMPRESS', tag: 'Lossless' },
-  { title: 'Convert text', desc: 'UTF-8 ↔ UTF-16, line endings, CSV→TSV.', href: '/upload?op=CONVERT', tag: 'Text' },
-  { title: 'Batch (soon)', desc: 'Premium — process many files in one queue.', href: '/pricing', tag: 'Pro' },
-  { title: 'File history', desc: 'Premium — re-download from cloud storage.', href: '/pricing', tag: 'Soon' },
-  { title: 'API-ready', desc: 'Spring Boot backend for auth & limits.', href: '/pricing', tag: 'Dev' },
+const tools = [
+  {
+    title: 'Compress Files',
+    description: 'Reduce file sizes by up to 90% with our custom compression algorithms.',
+    icon: FiArchive,
+    color: 'from-primary-500 to-primary-600',
+    href: '/upload?op=COMPRESS',
+    tag: 'Popular'
+  },
+  {
+    title: 'Decompress Files',
+    description: 'Restore your compressed files to their original quality with zero loss.',
+    icon: FiDownload,
+    color: 'from-indigo-500 to-blue-600',
+    href: '/upload?op=DECOMPRESS',
+    tag: 'Lossless'
+  },
+  {
+    title: 'Convert Text',
+    description: 'Convert between different text formats and encodings seamlessly.',
+    icon: FiFileText,
+    color: 'from-accent-500 to-pink-600',
+    href: '/upload?op=CONVERT',
+    tag: 'Text'
+  },
+  {
+    title: 'Image Compression',
+    description: 'Optimize images for web without losing visual quality.',
+    icon: FiImage,
+    color: 'from-orange-500 to-amber-600',
+    href: '/upload?op=COMPRESS',
+    tag: 'Images'
+  },
+  {
+    title: 'Audio Processing',
+    description: 'Compress and optimize audio files for storage and streaming.',
+    icon: FiMusic,
+    color: 'from-rose-500 to-red-600',
+    href: '/upload?op=COMPRESS',
+    tag: 'Audio'
+  },
+  {
+    title: 'Batch Processing',
+    description: 'Process multiple files at once with our premium plans.',
+    icon: FiFolder,
+    color: 'from-cyan-500 to-teal-600',
+    href: '/pricing',
+    tag: 'Premium'
+  },
 ];
 
-const whyUs = [
-  { title: 'Custom engine', text: 'Core compression is implemented in Java — no ZIP libraries for the main codecs.' },
-  { title: 'Clear limits', text: 'Guests, free, and paid tiers with daily quotas — enforced server-side.' },
-  { title: 'Progress everywhere', text: 'Upload and download bars so you always see what is happening.' },
+const features = [
+  {
+    title: 'Lightning Fast',
+    description: 'Process files in seconds with our optimized Java engine.',
+    icon: FiZap,
+    color: 'text-yellow-500',
+    bg: 'bg-yellow-50 dark:bg-yellow-900/20'
+  },
+  {
+    title: 'Secure & Private',
+    description: 'Your files are processed locally first and never stored without permission.',
+    icon: FiLock,
+    color: 'text-blue-500',
+    bg: 'bg-blue-50 dark:bg-blue-900/20'
+  },
+  {
+    title: 'Multiple Formats',
+    description: 'Support for ZIP, RAR, 7Z, PDF, images, audio, and more.',
+    icon: FiFile,
+    color: 'text-primary-600',
+    bg: 'bg-primary-50 dark:bg-primary-900/20'
+  },
+  {
+    title: 'High Compression',
+    description: 'Reduce file sizes by up to 90% using advanced algorithms.',
+    icon: FiTrendingUp,
+    color: 'text-accent-600',
+    bg: 'bg-accent-50 dark:bg-accent-900/20'
+  },
+  {
+    title: 'Cloud Integration',
+    description: 'Premium plans with cloud storage and file history.',
+    icon: FiCompass,
+    color: 'text-fuchsia-600',
+    bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20'
+  },
+  {
+    title: '24/7 Support',
+    description: 'Get help anytime with our dedicated support team.',
+    icon: FiShield,
+    color: 'text-pink-600',
+    bg: 'bg-pink-50 dark:bg-pink-900/20'
+  }
 ];
 
-const steps = [
-  { n: '1', title: 'Pick a tool', text: 'Open File tools and choose compress, decompress, or convert.' },
-  { n: '2', title: 'Upload one file', text: 'Drag & drop or browse. We process one file at a time on free tiers.' },
-  { n: '3', title: 'Download result', text: 'Your browser saves the output when processing completes.' },
-];
-
-const faqs = [
+const reviews = [
   {
-    q: 'Is filemagic.io free?',
-    a: 'Yes — guests can use core tools with limits. Sign up for higher limits; premium adds batch and history.',
+    name: 'Sarah Johnson',
+    role: 'Product Designer',
+    avatar: 'S',
+    rating: 5,
+    text: 'The best file compressor I have ever used! Fast and efficient.'
   },
   {
-    q: 'Do you use ZIP or PDF libraries for compression?',
-    a: 'No — our engine uses custom Huffman, LZ77, and RLE formats (FMH1, FML1, FMR1). Decompress detects the format.',
+    name: 'Mike Chen',
+    role: 'Software Engineer',
+    avatar: 'M',
+    rating: 5,
+    text: 'Great UI and amazing compression ratios. Highly recommend!'
   },
   {
-    q: 'Where are my files stored?',
-    a: 'Processing runs against your upload stream. Premium history + cloud storage will use your chosen provider (e.g. S3) when you connect the backend.',
-  },
-  {
-    q: 'Do I need to install Spring Boot?',
-    a: 'No separate app — you need JDK + Maven (or Docker) to run the API. The frontend is this React site only.',
-  },
+    name: 'Emily Davis',
+    role: 'Content Creator',
+    avatar: 'E',
+    rating: 5,
+    text: 'I use this daily to compress my images. Perfect quality!'
+  }
 ];
 
 export default function Home() {
   return (
-    <div>
-      {/* Hero */}
-      <section
-        className="relative overflow-hidden border-b border-slate-200/60 bg-gradient-to-b from-mist-100 via-white to-mist-50"
-        aria-labelledby="hero-heading"
-      >
-        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-plum-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-sage-400/25 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 md:flex md:items-center md:gap-12 md:pt-20">
-          <div className="flex-1">
-            <p className="inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-sage-600 shadow-sm ring-1 ring-sage-500/20">
-              Free online · No clutter · Built for speed
-            </p>
-            <h1 id="hero-heading" className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-5xl">
-              PDF & file tasks made <span className="text-sage-600">easy</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-lg text-slate-600">
-              Compress, decompress, and convert — in the browser, with a soft minimal UI inspired by leading tool
-              suites. Connect the API when you are ready for accounts and payments.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-amber-800 ring-1 ring-amber-200/80">
-                <span aria-hidden="true">★★★★★</span> <span className="font-semibold">4.9</span>
-                <span className="text-amber-700/80">(demo rating)</span>
-              </span>
-              <span>Trusted workflow · HTTPS-ready</span>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/upload"
-                className="inline-flex rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lift hover:bg-slate-800"
-              >
-                Open file tools
-              </Link>
-              <Link
-                to="/pricing"
-                className="inline-flex rounded-2xl border border-slate-200 bg-white/80 px-6 py-3 text-sm font-semibold text-slate-700 hover:border-sage-300"
-              >
-                View plans
-              </Link>
-            </div>
-          </div>
-          <div className="relative mt-12 flex flex-1 justify-center md:mt-0">
-            <div className="animate-float fm-glass relative w-full max-w-md rounded-3xl p-6 shadow-lift">
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-sage-400/30 to-plum-500/20 blur-xl" />
-              <div className="relative space-y-3">
-                <div className="h-3 w-3/4 rounded-full bg-mist-200" />
-                <div className="h-3 w-1/2 rounded-full bg-sage-200" />
-                <div className="h-24 rounded-2xl bg-gradient-to-br from-mist-100 to-white ring-1 ring-slate-100" />
-                <div className="flex gap-2">
-                  <span className="h-8 flex-1 rounded-lg bg-sage-500/20" />
-                  <span className="h-8 flex-1 rounded-lg bg-plum-500/20" />
+    <div className="min-h-screen bg-gradient-to-br from-mist-50 via-white to-accent-50 dark:from-slate-950 dark:via-slate-900 dark:to-purple-950 transition-colors">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        {/* Decorative Background Blobs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-primary-500/30 to-accent-500/20 rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-accent-500/20 to-primary-500/30 rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4" />
+
+        <div className="relative max-w-7xl mx-auto px-4 py-20 md:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6">
+                Compress, Convert & Manage Files with
+                <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent block mt-2">
+                  FileMagic
+                </span>
+              </h1>
+
+              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 mb-6 max-w-xl mx-auto lg:mx-0">
+                Watch the magic happen with your files!
+              </p>
+
+              {/* "See the Magic" text */}
+              <div className="mb-8">
+                <p className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold text-lg shadow-lg shadow-primary-500/30 animate-pulse">
+                  ✨ See the Magic ✨
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                <Link
+                  to="/upload"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold text-lg shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-all duration-300 hover:-translate-y-1"
+                >
+                  Start Free
+                  <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border-2 border-primary-200 dark:border-primary-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-semibold text-lg hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
+                >
+                  View Pricing
+                </Link>
+              </div>
+
+              <div className="flex items-center justify-center lg:justify-start gap-6 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-2">
+                  <FiCheckCircle className="w-5 h-5 text-primary-500" />
+                  <span>No credit card</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiCheckCircle className="w-5 h-5 text-primary-500" />
+                  <span>100% free basic</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiCheckCircle className="w-5 h-5 text-primary-500" />
+                  <span>Fast processing</span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Trust strip */}
-      <section className="border-b border-slate-200/60 bg-white/50 py-10" aria-labelledby="trust-heading">
-        <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 id="trust-heading" className="sr-only">
-            Trusted by teams
-          </h2>
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Trusted style</p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-8 opacity-70 grayscale">
-            {['Creators', 'Teams', 'Studios', 'Startups', 'Ops'].map((x) => (
-              <span key={x} className="font-display text-lg font-semibold text-slate-500">
-                {x}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Online tools grid — PDFGear “Free Online Tools” style */}
-      <section id="tools" className="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="tools-heading">
-        <h2 id="tools-heading" className="font-display text-center text-3xl font-bold text-slate-900">
-          Free online tools
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-slate-600">
-          A focused set of utilities — same spirit as suites like{' '}
-          <a href="https://www.pdfgear.com/" className="text-sage-600 underline" target="_blank" rel="noreferrer">
-            PDFgear
-          </a>
-          , with a calmer palette and a custom engine.
-        </p>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {onlineTools.map((t) => (
-            <article key={t.title} className="fm-card-3d fm-glass rounded-2xl p-5">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-display text-lg font-semibold text-slate-900">{t.title}</h3>
-                <span className="shrink-0 rounded-full bg-plum-500/10 px-2 py-0.5 text-xs font-semibold text-plum-600">
-                  {t.tag}
-                </span>
+            <div className="relative">
+              <div className="absolute -inset-6 bg-gradient-to-r from-primary-500/20 to-accent-500/20 rounded-3xl blur-2xl" />
+              <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-4 shadow-2xl border border-primary-100 dark:border-primary-900">
+                <FileHero3D />
               </div>
-              <p className="mt-2 text-sm text-slate-600">{t.desc}</p>
-              <Link to={t.href} className="mt-4 inline-block text-sm font-semibold text-sage-600 hover:underline">
-                Open →
-              </Link>
-            </article>
-          ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Why us */}
-      <section className="border-y border-slate-200/60 bg-mist-50/80 py-16" aria-labelledby="why-heading">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 id="why-heading" className="text-center font-display text-2xl font-bold text-slate-900">
-            Why filemagic.io
-          </h2>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {whyUs.map((w) => (
-              <article key={w.title} className="rounded-2xl border border-white/80 bg-white/70 p-6 shadow-sm">
-                <h3 className="font-display text-lg font-semibold text-slate-900">{w.title}</h3>
-                <p className="mt-2 text-sm text-slate-600">{w.text}</p>
-              </article>
+      {/* Trusted By Section */}
+      <section className="py-12 bg-white/70 dark:bg-slate-950/70 border-y border-primary-100 dark:border-primary-900/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-center text-sm font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-8">
+            Trusted by developers and designers worldwide
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-80">
+            {['TechCorp', 'DesignHub', 'DevStudio', 'CloudBase', 'DataFlow'].map((name, i) => (
+              <div key={i} className="text-2xl font-bold text-slate-700 dark:text-slate-300 font-display">
+                {name}
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="mx-auto max-w-6xl px-4 py-16" aria-labelledby="how-heading">
-        <h2 id="how-heading" className="text-center font-display text-2xl font-bold text-slate-900">
-          How it works
-        </h2>
-        <ol className="mt-10 grid gap-6 md:grid-cols-3">
-          {steps.map((s) => (
-            <li key={s.n} className="relative rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-              <span className="font-display text-3xl font-bold text-sage-200">{s.n}</span>
-              <h3 className="mt-2 font-display text-lg font-semibold text-slate-900">{s.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{s.text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* Tools Section */}
+      <section className="py-20 md:py-28 bg-gradient-to-br from-mist-50/50 to-accent-50/50 dark:from-slate-900 dark:to-purple-950/30">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-semibold mb-4">
+              Our Tools
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Powerful Tools for Every Need
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Everything you need to manage, compress, and convert your files in one place.
+            </p>
+          </div>
 
-      {/* Security */}
-      <section className="bg-slate-900 py-14 text-white" aria-labelledby="security-heading">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <h2 id="security-heading" className="font-display text-2xl font-bold">
-            Security &amp; privacy
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-slate-300">
-            The frontend talks to your Spring Boot API over HTTPS in production. Use strong JWT secrets, rate limits,
-            and validated uploads. Premium file history should use encrypted storage (e.g. S3 with SSE) and retention
-            policies you control.
-          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tools.map((tool, i) => (
+              <Link
+                key={i}
+                to={tool.href}
+                className="group relative bg-white dark:bg-slate-900 rounded-2xl p-6 border border-primary-100 dark:border-primary-900 hover:border-primary-300 dark:hover:border-primary-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+              >
+                <div className="absolute top-4 right-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${tool.color} text-white`}>
+                    {tool.tag}
+                  </span>
+                </div>
+
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <tool.icon className="w-7 h-7 text-white" />
+                </div>
+
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  {tool.title}
+                </h3>
+
+                <p className="text-slate-600 dark:text-slate-400 mb-4">
+                  {tool.description}
+                </p>
+
+                <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold">
+                  Get Started
+                  <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* FAQ — native HTML details/summary */}
-      <section className="mx-auto max-w-3xl px-4 py-16" aria-labelledby="faq-heading">
-        <h2 id="faq-heading" className="text-center font-display text-2xl font-bold text-slate-900">
-          Frequently asked questions
-        </h2>
-        <div className="mt-8 space-y-3">
-          {faqs.map((f) => (
-            <details key={f.q} className="group rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 open:shadow-md">
-              <summary className="cursor-pointer list-none font-semibold text-slate-900 marker:content-none [&::-webkit-details-marker]:hidden">
-                {f.q}
-              </summary>
-              <p className="mt-2 text-sm text-slate-600">{f.a}</p>
-            </details>
-          ))}
+      {/* Features Section */}
+      <section className="py-20 md:py-28 bg-white dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Why Choose FileMagic?
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Built for performance, security, and ease of use.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-primary-100 dark:border-primary-900 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-lg transition-all duration-300"
+              >
+                <div className={`w-12 h-12 rounded-xl ${feature.bg} flex items-center justify-center mb-4`}>
+                  <feature.icon className={`w-6 h-6 ${feature.color}`} />
+                </div>
+
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  {feature.title}
+                </h3>
+
+                <p className="text-slate-600 dark:text-slate-400">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="border-t border-slate-200/80 bg-gradient-to-r from-sage-500/10 to-plum-500/10 py-16" aria-labelledby="cta-heading">
-        <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 id="cta-heading" className="font-display text-2xl font-bold text-slate-900 md:text-3xl">
-            Ready to process a file?
-          </h2>
-          <p className="mx-auto mt-2 max-w-lg text-slate-600">
-            No install required in the browser — connect MySQL and run the API when you want full accounts and Razorpay.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/upload"
-              className="inline-flex rounded-2xl bg-slate-900 px-8 py-3.5 text-sm font-semibold text-white shadow-lift hover:bg-slate-800"
-            >
-              Go to file tools
-            </Link>
-            <Link
-              to="/register"
-              className="inline-flex rounded-2xl border border-slate-300 bg-white px-8 py-3.5 text-sm font-semibold text-slate-800 hover:border-sage-400"
-            >
-              Create free account
-            </Link>
+      {/* Reviews Section */}
+      <section className="py-20 md:py-28 bg-gradient-to-br from-mist-50 to-accent-50 dark:from-slate-900 dark:to-purple-950">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              What Our Users Say
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {reviews.map((review, i) => (
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-primary-100 dark:border-primary-900 shadow-lg">
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(review.rating)].map((_, j) => (
+                    <FiStar key={j} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+
+                <p className="text-slate-700 dark:text-slate-300 mb-6 italic">
+                  "{review.text}"
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold">
+                    {review.avatar}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">{review.name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{review.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 md:py-28 bg-white dark:bg-slate-950">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="bg-gradient-to-r from-primary-600 to-accent-600 rounded-3xl p-10 md:p-16 shadow-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Ready to Get Started?
+            </h2>
+            <p className="text-lg text-white/90 mb-10 max-w-2xl mx-auto">
+              Join thousands of users who trust FileMagic for their file management needs.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/upload"
+                className="px-8 py-4 rounded-2xl bg-white text-primary-600 font-semibold text-lg hover:bg-slate-50 transition-colors shadow-lg"
+              >
+                Start Compressing
+              </Link>
+              <Link
+                to="/register"
+                className="px-8 py-4 rounded-2xl bg-white/10 border-2 border-white/50 text-white font-semibold text-lg hover:bg-white/20 transition-colors"
+              >
+                Create Account
+              </Link>
+            </div>
           </div>
         </div>
       </section>

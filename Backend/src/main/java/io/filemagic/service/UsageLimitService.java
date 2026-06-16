@@ -3,7 +3,7 @@
  */
 package io.filemagic.service;
 
-import io.filemagic.model.SubscriptionPlan;
+import io.filemagic.document.SubscriptionPlan;
 import io.filemagic.repository.UsageDailyRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class UsageLimitService {
     public void assertUnderLimit(SubscriptionPlan plan, String subjectKey) {
         LocalDate day = LocalDate.now(ZoneOffset.UTC);
         int used = usageDailyRepository.getCount(day, subjectKey);
-        if (used >= plan.opsPerDay()) {
+        if (used >= plan.getOpsPerDay()) {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Daily operation limit reached");
         }
     }

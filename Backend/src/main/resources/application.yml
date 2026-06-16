@@ -2,20 +2,9 @@
 spring:
   application:
     name: filemagic-api
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-  sql:
-    init:
-      mode: never
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:filemagic}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=utf8
-    username: ${MYSQL_USER:filemagic}
-    password: ${MYSQL_PASSWORD:filemagic}
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb+srv://ayushdaharwal7_db_user:Invinicibles@149@mycluster.dwgudl0.mongodb.net/filemagic?retryWrites=true&w=majority&appName=MyCluster}
   servlet:
     multipart:
       max-file-size: ${MAX_UPLOAD_BYTES:53687091200}

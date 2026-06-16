@@ -3,7 +3,7 @@
  */
 package io.filemagic.controller;
 
-import io.filemagic.model.SubscriptionPlan;
+import io.filemagic.document.SubscriptionPlan;
 import io.filemagic.repository.SubscriptionPlanRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

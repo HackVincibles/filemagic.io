@@ -1,55 +1,49 @@
 package io.filemagic.repository;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import io.filemagic.document.StoredFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class StoredFileRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(StoredFileRepository.class);
 
-    public StoredFileRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final MongoStoredFileRepository mongoRepository;
+
+    public StoredFileRepository(MongoStoredFileRepository mongoRepository) {
+        this.mongoRepository = mongoRepository;
     }
 
-    public long insert(Long userId, String originalName, String contentType, long byteSize, String storagePath, String checksum, String operation, Instant expiresAt) {
-        KeyHolder kh = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO stored_files (user_id, original_name, content_type, byte_size, storage_path, checksum_sha256, operation_type, expires_at) VALUES (?,?,?,?,?,?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-            if (userId != null) ps.setLong(1, userId); else ps.setNull(1, java.sql.Types.BIGINT);
-            ps.setString(2, originalName);
-            ps.setString(3, contentType);
-            ps.setLong(4, byteSize);
-            ps.setString(5, storagePath);
-            ps.setString(6, checksum);
-            ps.setString(7, operation);
-            ps.setTimestamp(8, expiresAt != null ? Timestamp.from(expiresAt) : null);
-            return ps;
-        }, kh);
-        Number key = kh.getKey();
-        return key != null ? key.longValue() : -1L;
+    public StoredFile insert(String userId, String originalName, String contentType, long byteSize, String storagePath, String checksum, String operation, Instant expiresAt) {
+        try {
+            StoredFile file = new StoredFile(userId, originalName, contentType, byteSize, storagePath, checksum, operation, expiresAt);
+            return mongoRepository.save(file);
+        } catch (Exception e) {
+            log.error("Failed to insert stored file: {}", e.getMessage());
+            return null;
+        }
     }
 
-    public List<Map<String, Object>> findExpired(Instant now) {
-        return jdbcTemplate.queryForList(
-                "SELECT id, storage_path FROM stored_files WHERE expires_at <= ?",
-                Timestamp.from(now)
-        );
+    public List<StoredFile> findExpired(Instant now) {
+        try {
+            return mongoRepository.findByExpiresAtBefore(now);
+        } catch (Exception e) {
+            log.error("Failed to find expired files: {}", e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
-    public void deleteById(long id) {
-        jdbcTemplate.update("DELETE FROM stored_files WHERE id = ?", id);
+    public void deleteById(String id) {
+        try {
+            mongoRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Failed to delete file by id: {}", e.getMessage());
+        }
     }
 }

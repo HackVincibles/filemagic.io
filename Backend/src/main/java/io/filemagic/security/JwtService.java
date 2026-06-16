@@ -31,12 +31,12 @@ public class JwtService {
         this.accessMinutes = props.security().accessTokenMinutes();
     }
 
-    public String createAccessToken(long userId, String email) {
+    public String createAccessToken(String userId, String email) {
         Instant now = Instant.now();
         Instant exp = now.plusSeconds(accessMinutes * 60L);
         return Jwts.builder()
                 .issuer(issuer)
-                .subject(String.valueOf(userId))
+                .subject(userId)
                 .claim("email", email)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(exp))

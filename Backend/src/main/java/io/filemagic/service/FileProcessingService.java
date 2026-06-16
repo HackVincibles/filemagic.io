@@ -3,10 +3,10 @@
  */
 package io.filemagic.service;
 
+import io.filemagic.document.SubscriptionPlan;
 import io.filemagic.engine.conversion.text.TextTranscoder;
 import io.filemagic.engine.core.CompressionAlgorithm;
 import io.filemagic.engine.core.CompressionEngine;
-import io.filemagic.model.SubscriptionPlan;
 import io.filemagic.repository.StoredFileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,13 +35,13 @@ public class FileProcessingService {
             String operation,
             String conversionMode,
             String compressionAlgorithm,
-            Long userId
+            String userId
     ) {
         if (multipart == null || multipart.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is required");
         }
         long size = multipart.getSize();
-        if (size > plan.maxFileBytes()) {
+        if (size > plan.getMaxFileBytes()) {
             throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "File exceeds plan limit");
         }
         byte[] input;
@@ -71,18 +71,18 @@ public class FileProcessingService {
         // Handle persistence
         try {
             String storagePath = storageService.store(processed.bytes(), processed.downloadName());
-            java.time.Instant expiresAt = (userId == null) 
+            java.time.Instant expiresAt = (userId == null)
                 ? java.time.Instant.now() // Guest: expire now for instant cleanup
                 : java.time.Instant.now().plus(7, java.time.temporal.ChronoUnit.DAYS); // Registered: 7 days
-            
+
             storedFileRepository.insert(
-                userId, 
-                originalName, 
-                processed.contentType(), 
-                processed.bytes().length, 
-                storagePath, 
-                "sha256_placeholder", 
-                operation, 
+                userId,
+                originalName,
+                processed.contentType(),
+                processed.bytes().length,
+                storagePath,
+                "sha256_placeholder",
+                operation,
                 expiresAt
             );
         } catch (IOException e) {
@@ -125,7 +125,7 @@ public class FileProcessingService {
         CompressionAlgorithm algo = parseCompression(mode);
         CompressionAlgorithm effective = CompressionEngine.resolveAlgorithm(input, algo);
         byte[] out = CompressionEngine.compress(input, algo);
-        
+
         // Return original if compressed size is larger than original
         if (out.length >= input.length) {
             return new ProcessedFile(originalName, originalContentType, input);
@@ -134,12 +134,12 @@ public class FileProcessingService {
         // If we compressed it, append our custom extension to the ORIGINAL filename
         // This ensures the browser still has a hint about the original type but sees our format
         String ext = CompressionEngine.fileExtensionFor(effective);
-        String name = baseName(originalName) + "_compressed" + extensionOf(originalName); 
-        
-        // Use a more specific content type if it's our format, 
+        String name = baseName(originalName) + "_compressed" + extensionOf(originalName);
+
+        // Use a more specific content type if it's our format,
         // otherwise fallback to original if no compression happened
         String contentType = (effective == CompressionAlgorithm.NONE) ? originalContentType : "application/x-filemagic-compressed";
-        
+
         return new ProcessedFile(name, contentType, out);
     }
 
@@ -156,7 +156,7 @@ public class FileProcessingService {
             if (name.endsWith(".fmh")) name = name.substring(0, name.length() - 4);
             else if (name.endsWith(".fml")) name = name.substring(0, name.length() - 4);
             else if (name.endsWith(".fmr")) name = name.substring(0, name.length() - 4);
-            
+
             return new ProcessedFile(name, "application/octet-stream", out);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a valid FMH1/FML1/FMR1 payload");

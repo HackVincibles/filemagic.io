@@ -3,7 +3,7 @@
  */
 package io.filemagic.controller;
 
-import io.filemagic.model.UserRecord;
+import io.filemagic.document.User;
 import io.filemagic.service.AuthService;
 import io.filemagic.service.AuthService.TokenPair;
 import jakarta.validation.Valid;
@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +52,7 @@ public class AuthController {
     }
 
     @org.springframework.web.bind.annotation.GetMapping("/profile")
-    public ResponseEntity<UserRecord> profile(@org.springframework.security.core.annotation.AuthenticationPrincipal Long userId) {
+    public ResponseEntity<User> profile(@AuthenticationPrincipal String userId) {
         if (userId == null) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
         }

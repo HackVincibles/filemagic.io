@@ -1,47 +1,73 @@
 /*
- * Purpose: JDBC upsert for usage_daily (UTC dates).
+ * Purpose: Upsert for usage_daily (UTC dates).
  */
 package io.filemagic.repository;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import io.filemagic.document.UsageDaily;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class UsageDailyRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(UsageDailyRepository.class);
 
-    public UsageDailyRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final MongoUsageDailyRepository mongoRepository;
+
+    // In-memory fallback
+    private final Map<String, UsageDaily> usageByKey = new ConcurrentHashMap<>();
+
+    public UsageDailyRepository(MongoUsageDailyRepository mongoRepository) {
+        this.mongoRepository = mongoRepository;
+    }
+
+    private String getKey(LocalDate day, String subjectKey) {
+        return day.toString() + "|" + subjectKey;
     }
 
     public int getCount(LocalDate day, String subjectKey) {
-        Integer c = jdbcTemplate.query(
-                "SELECT operation_count FROM usage_daily WHERE usage_date = ? AND subject_key = ?",
-                rs -> {
-                    if (!rs.next()) {
-                        return 0;
-                    }
-                    return rs.getInt(1);
-                },
-                day,
-                subjectKey
-        );
-        return c != null ? c : 0;
+        try {
+            Optional<UsageDaily> usageOpt = mongoRepository.findByUsageDateAndSubjectKey(day, subjectKey);
+            if (usageOpt.isPresent()) {
+                return usageOpt.get().getOperationCount();
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get usage count from MongoDB: {}", e.getMessage());
+        }
+        UsageDaily usage = usageByKey.get(getKey(day, subjectKey));
+        return usage != null ? usage.getOperationCount() : 0;
     }
 
     public int incrementAndGet(LocalDate day, String subjectKey) {
-        jdbcTemplate.update(
-                """
-                        INSERT INTO usage_daily (usage_date, subject_key, operation_count)
-                        VALUES (?, ?, 1)
-                        ON DUPLICATE KEY UPDATE operation_count = operation_count + 1
-                        """,
-                day,
-                subjectKey
-        );
-        return getCount(day, subjectKey);
+        String key = getKey(day, subjectKey);
+        
+        try {
+            Optional<UsageDaily> usageOpt = mongoRepository.findByUsageDateAndSubjectKey(day, subjectKey);
+            UsageDaily usage;
+            if (usageOpt.isPresent()) {
+                usage = usageOpt.get();
+                usage.incrementOperationCount();
+            } else {
+                usage = new UsageDaily(day, subjectKey);
+                usage.incrementOperationCount();
+            }
+            UsageDaily saved = mongoRepository.save(usage);
+            return saved.getOperationCount();
+        } catch (Exception e) {
+            log.warn("Failed to increment usage in MongoDB, using in-memory: {}", e.getMessage());
+            UsageDaily usage = usageByKey.get(key);
+            if (usage == null) {
+                usage = new UsageDaily(day, subjectKey);
+            }
+            usage.incrementOperationCount();
+            usageByKey.put(key, usage);
+            return usage.getOperationCount();
+        }
     }
 }

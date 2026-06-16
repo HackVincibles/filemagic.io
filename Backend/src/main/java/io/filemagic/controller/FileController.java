@@ -3,7 +3,7 @@
  */
 package io.filemagic.controller;
 
-import io.filemagic.model.SubscriptionPlan;
+import io.filemagic.document.SubscriptionPlan;
 import io.filemagic.security.GuestIdentityService;
 import io.filemagic.service.FileProcessingService;
 import io.filemagic.service.FileProcessingService.ProcessedFile;
@@ -59,9 +59,9 @@ public class FileController {
         String subjectKey = planResolutionService.subjectKey(authentication, guestFp);
 
         usageLimitService.assertUnderLimit(plan, subjectKey);
-        
-        Long userId = (authentication != null && authentication.getPrincipal() instanceof io.filemagic.security.JwtAuthenticationFilter.AuthenticatedUser au) 
-            ? au.id() 
+
+        String userId = (authentication != null && authentication.getPrincipal() instanceof String)
+            ? (String) authentication.getPrincipal()
             : null;
 
         ProcessedFile processed = fileProcessingService.process(

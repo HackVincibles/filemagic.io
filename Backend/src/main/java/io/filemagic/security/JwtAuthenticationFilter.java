@@ -39,13 +39,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7).trim();
             try {
                 Claims claims = jwtService.parseAndValidate(token);
-                long userId = Long.parseLong(claims.getSubject());
+                String userId = claims.getSubject();
                 String email = claims.get("email", String.class);
+                // Set principal as userId string for @AuthenticationPrincipal to work
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        new AuthenticatedUser(userId, email),
+                        userId,
                         null,
                         List.of(new SimpleGrantedAuthority("ROLE_USER"))
                 );
+                auth.setDetails(new AuthenticatedUser(userId, email));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (Exception ignored) {
                 SecurityContextHolder.clearContext();
@@ -54,6 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public record AuthenticatedUser(long id, String email) {
+    public record AuthenticatedUser(String id, String email) {
     }
 }

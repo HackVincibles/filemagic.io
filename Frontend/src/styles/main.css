@@ -1,9 +1,9 @@
 /* Purpose: Global Tailwind layers + subtle motion (GPU-friendly). */
+@import './variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './variables.css';
 
 @layer base {
   html {

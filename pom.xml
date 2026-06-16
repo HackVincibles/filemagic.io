@@ -13,7 +13,7 @@
     <description>Root for filemagic.io project</description>
 
     <modules>
-        <module>file-processing-engine</module>
+        <module>Backend/file-processing-engine</module>
         <module>Backend</module>
     </modules>
 
