@@ -65,6 +65,8 @@ public class FileProcessingService {
             case "PDF_TO_WORD" -> pdfOperation(originalName, input, "TO_WORD");
             case "PDF_OCR" -> pdfOperation(originalName, input, "OCR");
             case "PDF_SUMMARIZE" -> pdfOperation(originalName, input, "SUMMARIZE");
+            case "PDF_TO_PNG" -> pdfOperation(originalName, input, "TO_PNG");
+            case "PDF_TO_EXCEL" -> pdfOperation(originalName, input, "TO_EXCEL");
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown operation");
         };
 
@@ -102,17 +104,23 @@ public class FileProcessingService {
                 case "TO_WORD" -> pdfService.pdfToWord(input);
                 case "OCR" -> pdfService.performOcr(input);
                 case "SUMMARIZE" -> pdfService.summarizePdf(input).getBytes();
+                case "TO_PNG" -> pdfService.pdfToPng(input);
+                case "TO_EXCEL" -> pdfService.pdfToExcel(input);
                 default -> throw new IllegalArgumentException("Unknown PDF sub-op");
             };
             String ext = switch (subOp) {
                 case "TO_WORD" -> ".docx";
                 case "OCR", "SUMMARIZE" -> ".txt";
+                case "TO_PNG" -> ".png";
+                case "TO_EXCEL" -> ".xlsx";
                 default -> ".pdf";
             };
             String name = baseName(originalName) + "." + subOp.toLowerCase() + ext;
             String contentType = switch (subOp) {
                 case "TO_WORD" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 case "OCR", "SUMMARIZE" -> "text/plain";
+                case "TO_PNG" -> "image/png";
+                case "TO_EXCEL" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 default -> "application/pdf";
             };
             return new ProcessedFile(name, contentType, out);

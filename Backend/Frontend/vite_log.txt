@@ -1,0 +1,25 @@
+
+> filemagic-frontend@0.1.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 356 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+✘ [ERROR] The build was canceled
+
+[vite:css] Gradient has outdated direction syntax. New syntax is like `closest-side at 0 0` instead of `0 0, closest-side`.
+4  |  @tailwind base;
+5  |  @tailwind components;
+6  |  @tailwind utilities;
+   |  ^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  @layer base {
+[vite:css] Gradient has outdated direction syntax. New syntax is like `closest-side at 0 0` instead of `0 0, closest-side`.
+4  |  @tailwind base;
+5  |  @tailwind components;
+6  |  @tailwind utilities;
+   |  ^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  @layer base {

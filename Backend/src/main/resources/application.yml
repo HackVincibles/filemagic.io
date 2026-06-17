@@ -4,7 +4,7 @@ spring:
     name: filemagic-api
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://ayushdaharwal7_db_user:Invinicibles@149@mycluster.dwgudl0.mongodb.net/filemagic?retryWrites=true&w=majority&appName=MyCluster}
+      uri: ${MONGODB_URI:mongodb+srv://ayushdaharwal7_db_user:Invincibles%40149@mycluster.dwgudl0.mongodb.net/filemagic?retryWrites=true&w=majority&appName=MyCluster}
   servlet:
     multipart:
       max-file-size: ${MAX_UPLOAD_BYTES:53687091200}

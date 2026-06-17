@@ -12,6 +12,11 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -111,11 +116,55 @@ public class PdfService {
 
     // Placeholder for more complex operations
     public byte[] pdfToWord(byte[] input) throws IOException {
-        // Real PDF to Word is complex. This is a very basic placeholder using POI.
-        try (XWPFDocument doc = new XWPFDocument()) {
-            doc.createParagraph().createRun().setText("PDF Content Placeholder");
+        try (PDDocument pdfDoc = Loader.loadPDF(input);
+             XWPFDocument wordDoc = new XWPFDocument()) {
+             
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(pdfDoc);
+            
+            String[] lines = text.split("\\r?\\n");
+            for (String line : lines) {
+                wordDoc.createParagraph().createRun().setText(line);
+            }
+            
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            doc.write(out);
+            wordDoc.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] pdfToPng(byte[] input) throws IOException {
+        try (PDDocument doc = Loader.loadPDF(input)) {
+            PDFRenderer renderer = new PDFRenderer(doc);
+            BufferedImage image = renderer.renderImageWithDPI(0, 300);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(image, "PNG", out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] pdfToExcel(byte[] input) throws IOException {
+        try (PDDocument pdfDoc = Loader.loadPDF(input);
+             XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(pdfDoc);
+
+            XSSFSheet sheet = workbook.createSheet("Extracted Data");
+            String[] lines = text.split("\\r?\\n");
+            
+            for (int i = 0; i < lines.length; i++) {
+                XSSFRow row = sheet.createRow(i);
+                // Attempt basic parsing by splitting line by spaces/tabs
+                String[] columns = lines[i].split("\\s{2,}|\\t"); 
+                for (int j = 0; j < columns.length; j++) {
+                    XSSFCell cell = row.createCell(j);
+                    cell.setCellValue(columns[j].trim());
+                }
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
             return out.toByteArray();
         }
     }

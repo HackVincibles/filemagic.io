@@ -59,6 +59,7 @@ public class SecurityConfiguration {
         c.setAllowedOrigins(Arrays.asList(props.cors().allowedOrigins()));
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
+        c.setExposedHeaders(List.of("Content-Disposition"));
         c.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
