@@ -11,6 +11,6 @@ target/
 .env.local
 .env.*.local
 tmp/
-data/
+/data/
 *.log
 .DS_Store
