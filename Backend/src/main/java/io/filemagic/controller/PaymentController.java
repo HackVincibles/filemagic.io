@@ -42,10 +42,14 @@ public class PaymentController {
             @AuthenticationPrincipal String userId,
             @RequestBody Map<String, String> body) {
 
-        String planCode = body.getOrDefault("planId", null);
+        String planId = body.getOrDefault("planId", null);
+        if (planId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "planId is required");
+        }
+        
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        SubscriptionPlan plan = planRepository.findByCode(planCode)
+        SubscriptionPlan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found"));
 
         try {

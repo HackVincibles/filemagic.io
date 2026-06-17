@@ -53,11 +53,9 @@ public class StripeService {
     }
 
     private long calculateAmount(SubscriptionPlan plan) {
-        // Example logic: Individual = $9.99, Business = $49.99
-        return switch (plan.getCode()) {
-            case "INDIVIDUAL" -> 999L;
-            case "BUSINESS" -> 4999L;
-            default -> 0L;
-        };
+        if (plan.getPriceUsd() == null) {
+            return 0L;
+        }
+        return Math.round(plan.getPriceUsd() * 100);
     }
 }

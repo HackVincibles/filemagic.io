@@ -63,10 +63,12 @@ public class SubscriptionPlanRepository {
     }
 
     public Optional<SubscriptionPlan> findByCode(String code) {
+        if (code == null) return Optional.empty();
         return Optional.ofNullable(byCode.get(code));
     }
 
     public Optional<SubscriptionPlan> findById(String id) {
+        if (id == null) return Optional.empty();
         return Optional.ofNullable(byId.get(id));
     }
 
