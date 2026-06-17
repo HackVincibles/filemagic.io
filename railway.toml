@@ -1,6 +1,0 @@
-[build]
-builder = "nixpacks"
-buildCommand = "mvn clean install -Pproduction && cp Backend/target/*.jar ."
-
-[deploy]
-startCommand = "sh -c 'java -jar filemagic-api-*.jar'"
