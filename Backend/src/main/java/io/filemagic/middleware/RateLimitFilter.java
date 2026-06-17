@@ -37,7 +37,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (!request.getRequestURI().startsWith("/api/")) {
+        if (!request.getRequestURI().startsWith("/api/") || request.getMethod().equalsIgnoreCase("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
         }
